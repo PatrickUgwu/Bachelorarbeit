@@ -1,2 +1,2 @@
 # Bachelorarbeit
-Collaborative Work in SwarmJS
+Collaborative Editor for Robotic Swarms
