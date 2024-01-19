@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Collaborative Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div>
+        <textarea id="editor" rows="10" cols="50" placeholder="Start typing..."></textarea>
+        <div id="user-list"></div>
+    </div>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Event handler for changes in the text area
+        document.getElementById('editor').addEventListener('input', function() {
+            var text = this.value;
+            socket.emit('text_input', { 'text': text });
+        });
+
+        // Event handler for receiving updates from the server
+        socket.on('update_editor', function(data) {
+            document.getElementById('editor').value = data.text;
+        });
+
+        // Event handler for receiving updated texts from other users
+        socket.on('update_texts', function(user_texts) {
+            updateUsersList(user_texts);
+        });
+
+        // Function to update the user list
+        function updateUsersList(user_texts) {
+            var userListDiv = document.getElementById('user-list');
+            userListDiv.innerHTML = '<h3>Users:</h3>';
+
+            for (var user_id in user_texts) {
+                if (user_texts.hasOwnProperty(user_id)) {
+                    userListDiv.innerHTML += '<p>' + user_id + ': ' + user_texts[user_id] + '</p>';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
