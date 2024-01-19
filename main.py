@@ -8,11 +8,12 @@ socketio = SocketIO(app)
 # Dictionary zum Speichern der Benutzer und ihrer Texte
 user_texts = {}
 
+# Variable
+variable = ''
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @socketio.on('text_input')
 def handle_text_input(data):
@@ -28,7 +29,13 @@ def handle_text_input(data):
     # Aktuelle Texte aller Benutzer senden
     emit('update_texts', user_texts, broadcast=True)
 
+@socketio.on('variable_input')
+def handle_variable_input(data):
+    global variable
+    variable = data['value']
+
+    # Aktualisierte Variable an alle Benutzer senden
+    emit('update_variable', variable, broadcast=True)
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
-

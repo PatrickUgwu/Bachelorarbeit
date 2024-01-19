@@ -4,26 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real-Time Collaborative Editor</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <!-- ACE Editor CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.12/src-min-noconflict/ace.js"></script>
+    <style>
+        #editor {
+            width: 100%;
+            height: 000px;
+            margin-top: 10px;
+        }
+
+        .variable-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 10px;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .variable {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .variable-name {
+            margin-right: 10px;
+        }
+
+        .variable-input {
+            width: 200px;
+        }
+    </style>
 </head>
 <body>
     <div>
-        <textarea id="editor" rows="10" cols="50" placeholder="Start typing..."></textarea>
+        <div id="editor"></div>
         <div id="user-list"></div>
+        <div class="variable-container">
+            <div class="variable">
+                <span class="variable-name">Variable 1:</span>
+                <input type="text" class="variable-input" id="variable-input-1">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 2:</span>
+                <input type="text" class="variable-input" id="variable-input-2">
+            </div>
+            <!-- Wiederhole dieses Muster für die restlichen 8 Variablen -->
+            <div class="variable">
+                <span class="variable-name">Variable 3:</span>
+                <input type="text" class="variable-input" id="variable-input-3">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 4:</span>
+                <input type="text" class="variable-input" id="variable-input-4">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 5:</span>
+                <input type="text" class="variable-input" id="variable-input-5">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 6:</span>
+                <input type="text" class="variable-input" id="variable-input-6">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 7:</span>
+                <input type="text" class="variable-input" id="variable-input-7">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 8:</span>
+                <input type="text" class="variable-input" id="variable-input-8">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 9:</span>
+                <input type="text" class="variable-input" id="variable-input-9">
+            </div>
+            <div class="variable">
+                <span class="variable-name">Variable 10:</span>
+                <input type="text" class="variable-input" id="variable-input-10">
+            </div>
+        </div>
     </div>
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        // Event handler for changes in the text area
-        document.getElementById('editor').addEventListener('input', function() {
-            var text = this.value;
+        // ACE Editor initialization
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode("ace/mode/python");
+
+        // Event handler for changes in the ACE editor
+        editor.getSession().on('change', function() {
+            var text = editor.getValue();
             socket.emit('text_input', { 'text': text });
         });
 
         // Event handler for receiving updates from the server
         socket.on('update_editor', function(data) {
-            document.getElementById('editor').value = data.text;
+            editor.setValue(data.text);
         });
 
         // Event handler for receiving updated texts from other users
@@ -42,6 +121,33 @@
                 }
             }
         }
+
+        // Event handler for receiving updated variables from the server
+        socket.on('update_variable', function(variable) {
+            updateVariables(variable);
+        });
+
+        // Function to update the variables
+        function updateVariables(variable) {
+            for (var i = 1; i <= 10; i++) {
+                var variableInput = document.getElementById('variable-input-' + i);
+                variableInput.value = variable['Variable ' + i];
+            }
+        }
+
+        // Initial update of variables
+        updateVariables({
+            'Variable 1': '',
+            'Variable 2': '',
+            'Variable 3': '',
+            'Variable 4': '',
+            'Variable 5': '',
+            'Variable 6': '',
+            'Variable 7': '',
+            'Variable 8': '',
+            'Variable 9': '',
+            'Variable 10': ''
+        });
     </script>
 </body>
 </html>
